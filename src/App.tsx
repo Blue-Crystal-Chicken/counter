@@ -1,21 +1,51 @@
-import { Button } from "@/components/ui/button"
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Login } from "./components/pages/login";
+import { Home } from "./components/pages/home";
+import { Order } from "./components/pages/order";
+import { MainLayout } from "./components/layout/MainLayout";
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <MainLayout>{children}</MainLayout>;
+}
 
 export function App() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
-  )
+    <Routes>
+      {/* Public Route */}
+      <Route path="/login" element={<Login />} />
+      
+      {/* Protected Routes */}
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/order/:code"
+        element={
+          <ProtectedRoute>
+            <Order />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Fallback Redirections */}
+      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
