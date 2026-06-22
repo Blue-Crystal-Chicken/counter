@@ -422,7 +422,7 @@ export function Order() {
                         onClick={() => handleUpdateQuantity(item.id, -1)}
                         className="h-8 w-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-extrabold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-xs"
                       >
-                        <Minus className="w-3.5 h-3.5 stroke-[3]" />
+                        <Minus className="w-3.5 h-3.5 stroke-3" />
                       </button>
                       <span className="min-w-8 text-center text-sm font-black text-slate-900 dark:text-white">
                         {item.quantity}
@@ -431,7 +431,7 @@ export function Order() {
                         onClick={() => handleUpdateQuantity(item.id, 1)}
                         className="h-8 w-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-extrabold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-xs"
                       >
-                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        <Plus className="w-3.5 h-3.5 stroke-3" />
                       </button>
                     </div>
                   ) : (
