@@ -33,6 +33,7 @@ export function Order() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Product Selection States
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -258,9 +259,8 @@ export function Order() {
     }
   };
 
-  const handleCancelOrder = async () => {
+  const executeCancelOrder = async () => {
     if (!order) return;
-    if (!window.confirm("Sei sicuro di voler annullare questo ordine permanentemente?")) return;
 
     setActionLoading(true);
     setError("");
@@ -283,11 +283,12 @@ export function Order() {
         throw new Error("Errore durante l'annullamento dell'ordine.");
       }
 
-      alert("Ordine annullato con successo!");
+      setShowCancelModal(false);
       navigate("/home");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Errore nell'annullamento dell'ordine.");
       setActionLoading(false);
+      setShowCancelModal(false);
     }
   };
 
@@ -399,7 +400,7 @@ export function Order() {
                     {getCategoryEmoji(item.type === "PRODUCT" ? "HAMBURGER" : "DESSERT")}
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-slate-855 dark:text-slate-100 text-sm">
+                    <h4 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm">
                       {item.name}
                     </h4>
                     {item.specialNote && (
@@ -416,21 +417,21 @@ export function Order() {
                 <div className="flex items-center gap-4">
                   {/* Quantity adjustments for edit mode */}
                   {isEditing ? (
-                    <div className="flex items-center bg-white dark:bg-slate-850 rounded-xl p-1 shadow-sm border border-slate-250/50 dark:border-slate-800">
+                    <div className="flex items-center bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-800 gap-1">
                       <button
                         onClick={() => handleUpdateQuantity(item.id, -1)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold"
+                        className="h-8 w-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-extrabold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-xs"
                       >
-                        <Minus className="w-3.5 h-3.5" />
+                        <Minus className="w-3.5 h-3.5 stroke-[3]" />
                       </button>
-                      <span className="min-w-8 text-center text-sm font-black text-slate-850 dark:text-white">
+                      <span className="min-w-8 text-center text-sm font-black text-slate-900 dark:text-white">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => handleUpdateQuantity(item.id, 1)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold"
+                        className="h-8 w-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-extrabold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-xs"
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
                       </button>
                     </div>
                   ) : (
@@ -497,7 +498,7 @@ export function Order() {
               {!isPaid && (
                 <Button
                   variant="destructive"
-                  onClick={handleCancelOrder}
+                  onClick={() => setShowCancelModal(true)}
                   disabled={actionLoading}
                   className="h-12 px-5 rounded-xl font-bold gap-2 shadow-md shadow-red-500/5 active:scale-[0.98] transition-all hover:scale-[1.02] flex items-center justify-center shrink-0"
                 >
@@ -637,6 +638,54 @@ export function Order() {
         )}
 
       </div>
+
+      {/* Custom Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop blur overlay */}
+          <div 
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" 
+            onClick={() => setShowCancelModal(false)}
+          />
+          {/* Modal content */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500 mb-4">
+              <Ban className="w-6 h-6 stroke-[2.5]" />
+            </div>
+            
+            <h3 className="text-lg font-black text-slate-800 dark:text-white mb-2">
+              Annulla Ordine
+            </h3>
+            
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-bold leading-relaxed mb-6">
+              Sei sicuro di voler annullare questo ordine permanentemente? Questa azione non può essere annullata.
+            </p>
+            
+            <div className="flex gap-3 w-full">
+              <Button
+                variant="outline"
+                onClick={() => setShowCancelModal(false)}
+                disabled={actionLoading}
+                className="flex-1 h-11 rounded-xl font-bold border-slate-200 dark:border-slate-800 dark:text-slate-300 text-xs"
+              >
+                Chiudi
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={executeCancelOrder}
+                disabled={actionLoading}
+                className="flex-1 h-11 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-500/10"
+              >
+                {actionLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Sì, Annulla"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
