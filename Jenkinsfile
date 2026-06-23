@@ -1,4 +1,3 @@
-// test build trigger via git push
 pipeline {
     agent any
 
