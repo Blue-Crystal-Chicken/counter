@@ -18,7 +18,7 @@ pipeline {
         stage('Installazione e Build') {
             steps {
                 echo '=== Installazione dipendenze e compilazione (Vite) ==='
-                sh "docker run --rm -v bcc_jenkins_data:/var/jenkins_home -w ${WORKSPACE} node:20-alpine sh -c 'corepack enable && pnpm install --frozen-lockfile && pnpm run build'"
+                sh "docker run --rm -v bcc_jenkins_data:/var/jenkins_home -w \"${WORKSPACE}\" node:22-alpine sh -c 'corepack enable && pnpm install --frozen-lockfile && pnpm run build'"
             }
         }
     }
